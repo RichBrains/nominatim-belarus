@@ -50,6 +50,9 @@ RUN service postgresql start && \
     useradd -m -p password1234 nominatim && \
     chown -R nominatim:nominatim ./src && \
     sudo -u nominatim ./src/utils/setup.php --osm-file /app/src/data.osm.pbf --all --threads 2 && \
+    rm ./src/settings/configuration.txt && \
+    sudo -u nominatim ./src/utils/setup.php --osmosis-init && \
+    sudo -u nominatim ./src/utils/setup.php --create-functions --enable-diff-updates && \
     service postgresql stop
 
 EXPOSE 5432
