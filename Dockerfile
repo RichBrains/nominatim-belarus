@@ -41,7 +41,7 @@ RUN rm -rf /var/www/html/* && ./src/utils/setup.php --create-website /var/www/ht
 COPY nominatim.conf /etc/apache2/sites-enabled/000-default.conf
 
 # Load initial data
-ENV PBF_DATA https://s3.amazonaws.com/mapzen.odes/ex_E9zAD748tYq7SXH1SRabp8ShFnkNj.osm.pbf
+ENV PBF_DATA https://s3.amazonaws.com/mapzen.odes/ex_QvwLDPTjrCth9vGNuuX23Y4gayyqw.osm.pbf
 RUN curl -L $PBF_DATA --create-dirs -o /app/src/data.osm.pbf
 RUN service postgresql start && \
     sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='nominatim'" | grep -q 1 || sudo -u postgres createuser -s nominatim && \
