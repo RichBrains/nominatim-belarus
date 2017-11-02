@@ -1,37 +1,35 @@
-FROM ubuntu:trusty
-MAINTAINER winsent <pipetc@gmail.com>
+FROM ubuntu:xenial
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV LANG C.UTF-8
-RUN locale-gen en_US.UTF-8
-RUN update-locale LANG=en_US.UTF-8
+ENV USERNAME nominatim
+ENV USERHOME /app
 
-# Install packages http://wiki.openstreetmap.org/wiki/Nominatim/Installation#Ubuntu.2FDebian
 RUN apt-get -y update --fix-missing && \
-    apt-get install -y build-essential libxml2-dev libpq-dev libbz2-dev libtool automake \
-    libproj-dev libboost-dev libboost-system-dev libboost-filesystem-dev \
-    libboost-thread-dev libexpat-dev gcc proj-bin libgeos-c1 libgeos++-dev \
-    libexpat-dev php5 php-pear php5-pgsql php5-json php-db libapache2-mod-php5 \
-    postgresql postgis postgresql-contrib postgresql-9.3-postgis-2.1 \
-    postgresql-server-dev-9.3 curl git autoconf-archive cmake python \
-    lua5.1 liblua5.1-dev libluabind-dev \
-    osmosis && \
+    apt-get -y install wget && \
+    sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt xenial-pgdg main" >> /etc/apt/sources.list' && \
+    wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - && \
+    apt-get -y update
+    
+RUN apt-get -y -f install postgresql-9.6 \
+    postgresql-9.6 postgresql-9.6-postgis-2.3 postgresql-contrib-9.6 postgresql-9.6-postgis-scripts \  
+    curl build-essential cmake g++ libboost-dev libboost-system-dev \
+    libboost-filesystem-dev libexpat1-dev zlib1g-dev libxml2-dev\
+    libbz2-dev libpq-dev libgeos-dev libgeos++-dev libproj-dev \
+    apache2 php php-pgsql libapache2-mod-php php-pear php-db \
+    php-intl git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/* /var/tmp/*
 
 WORKDIR /app
 
-# Configure postgres
-RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.3/main/pg_hba.conf && \
-    echo "listen_addresses='*'" >> /etc/postgresql/9.3/main/postgresql.conf
+RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.6/main/pg_hba.conf && \
+    echo "listen_addresses='*'" >> /etc/postgresql/9.6/main/postgresql.conf
 
 # Nominatim install
-ENV NOMINATIM_VERSION v.2.5.0
+ENV NOMINATIM_VERSION v.3.0.0
 RUN git clone --recursive https://github.com/openstreetmap/Nominatim ./src
 RUN cd ./src && git checkout $NOMINATIM_VERSION && git submodule update --recursive --init && \
   ./autogen.sh && ./configure && make
-
 
 # Nominatim create site
 COPY local.php ./src/settings/local.php
