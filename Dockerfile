@@ -15,6 +15,7 @@ RUN apt-get -y -f install postgresql-9.6 sudo \
     libboost-filesystem-dev libexpat1-dev zlib1g-dev libxml2-dev\
     libbz2-dev libpq-dev libgeos-dev libgeos++-dev libproj-dev \
     apache2 php php-pgsql libapache2-mod-php php-pear php-db \
+    python-setuptools libboost-python-dev libexpat1-dev zlib1g-dev libbz2-dev && \
     php-intl git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
@@ -44,7 +45,9 @@ RUN service postgresql start && \
     sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='www-data'" | grep -q 1 || sudo -u postgres createuser -SDR www-data && \
     useradd -m -p password1234 nominatim && \
     chown -R nominatim:nominatim ./Nominatim-3.0.0 && \
-    sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --osm-file /app/Nominatim-3.0.0/data.osm.pbf --all --threads 2 && \
+    sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --osm-file /app/Nominatim-3.0.0/data.osm.pbf --all --threads 2
+
+RUN sudo easy_install pip && pip install osmium && \
     sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --init-updates && \
     sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --create-functions --enable-diff-updates && \
     service postgresql stop
