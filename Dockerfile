@@ -15,7 +15,7 @@ RUN apt-get -y -f install postgresql-9.6 sudo \
     libboost-filesystem-dev libexpat1-dev zlib1g-dev libxml2-dev\
     libbz2-dev libpq-dev libgeos-dev libgeos++-dev libproj-dev \
     apache2 php php-pgsql libapache2-mod-php php-pear php-db \
-    python-setuptools libboost-python-dev libexpat1-dev zlib1g-dev libbz2-dev && \
+    python-setuptools libboost-python-dev libexpat1-dev zlib1g-dev libbz2-dev \
     php-intl git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
