@@ -26,19 +26,16 @@ WORKDIR /app
 RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.6/main/pg_hba.conf && \
     echo "listen_addresses='*'" >> /etc/postgresql/9.6/main/postgresql.conf
 
-# Nominatim install
 ENV NOMINATIM_VERSION v3.0.1
 RUN wget http://www.nominatim.org/release/Nominatim-3.0.0.tar.bz2 && tar xf Nominatim-3.0.0.tar.bz2
 RUN cd Nominatim-3.0.0 && mkdir build && cd build && cmake .. && make
 
-# Nominatim create site
 COPY local.php ./Nominatim-3.0.0/build/settings/local.php
 
-# Apache configure
 COPY nominatim.conf /etc/apache2/sites-enabled/000-default.conf
 
 # Load initial data
-ENV PBF_DATA https://s3.amazonaws.com/mapzen.odes/ex_QvwLDPTjrCth9vGNuuX23Y4gayyqw.osm.pbf
+ENV PBF_DATA https://s3.amazonaws.com/mapzen.odes/ex_2pzbDZU9E2it4aTiU79LgLTPJW4zF.osm.pbf
 RUN curl -L $PBF_DATA --create-dirs -o /app/Nominatim-3.0.0/data.osm.pbf
 RUN service postgresql start && \
     sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='nominatim'" | grep -q 1 || sudo -u postgres createuser -s nominatim && \
@@ -48,8 +45,7 @@ RUN service postgresql start && \
     sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --osm-file /app/Nominatim-3.0.0/data.osm.pbf --all --threads 2
 
 RUN sudo easy_install pip && pip install osmium && \
-    sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --init-updates && \
-    sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --create-functions --enable-diff-updates && \
+    sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --init-updates && \  
     service postgresql stop
 
 EXPOSE 5432
