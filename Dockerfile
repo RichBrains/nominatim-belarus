@@ -34,7 +34,8 @@ COPY local.php ./Nominatim-3.0.0/build/settings/local.php
 
 COPY nominatim.conf /etc/apache2/sites-enabled/000-default.conf
 
-# Load initial data
+RUN sudo easy_install pip && pip install osmium
+
 ENV PBF_DATA https://s3.amazonaws.com/mapzen.odes/ex_2pzbDZU9E2it4aTiU79LgLTPJW4zF.osm.pbf
 RUN curl -L $PBF_DATA --create-dirs -o /app/Nominatim-3.0.0/data.osm.pbf
 RUN service postgresql start && \
@@ -42,10 +43,9 @@ RUN service postgresql start && \
     sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='www-data'" | grep -q 1 || sudo -u postgres createuser -SDR www-data && \
     useradd -m -p password1234 nominatim && \
     chown -R nominatim:nominatim ./Nominatim-3.0.0 && \
-    sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --osm-file /app/Nominatim-3.0.0/data.osm.pbf --all --threads 2
-
-RUN sudo easy_install pip && pip install osmium && \
-    sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --init-updates && \  
+    sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --osm-file /app/Nominatim-3.0.0/data.osm.pbf --all --threads 2 && \
+    sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --init-updates && \
+    sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --import-osmosis-all && \
     service postgresql stop
 
 EXPOSE 5432
