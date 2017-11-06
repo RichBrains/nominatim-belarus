@@ -45,7 +45,6 @@ RUN service postgresql start && \
     chown -R nominatim:nominatim ./Nominatim-3.0.0 && \
     sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --osm-file /app/Nominatim-3.0.0/data.osm.pbf --all --threads 2 && \
     sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --init-updates && \
-    sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --import-osmosis-all && \
     service postgresql stop
 
 EXPOSE 5432
