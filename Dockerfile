@@ -36,7 +36,7 @@ COPY nominatim.conf /etc/apache2/sites-enabled/000-default.conf
 
 RUN sudo easy_install pip && pip install osmium
 
-ENV PBF_DATA https://s3.amazonaws.com/mapzen.odes/ex_2pzbDZU9E2it4aTiU79LgLTPJW4zF.osm.pbf
+ENV PBF_DATA https://s3.amazonaws.com/mapzen.odes/ex_VjaZecMhNGAe7VCssBU6nFHY95zEw.osm.pbf
 RUN curl -L $PBF_DATA --create-dirs -o /app/Nominatim-3.0.0/data.osm.pbf
 RUN service postgresql start && \
     sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='nominatim'" | grep -q 1 || sudo -u postgres createuser -s nominatim && \
