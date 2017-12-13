@@ -27,23 +27,23 @@ RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.6/main/pg_hba.
     echo "listen_addresses='*'" >> /etc/postgresql/9.6/main/postgresql.conf
 
 RUN wget http://www.nominatim.org/release/Nominatim-3.0.1.tar.bz2 && tar xf Nominatim-3.0.1.tar.bz2
-RUN cd Nominatim-3.0.1 && mkdir build && cd build && cmake .. && make
+RUN mv Nominatim-3.0.1 Nominatim && cd Nominatim && mkdir build && cd build && cmake .. && make
 
-COPY local.php ./Nominatim-3.0.1/build/settings/local.php
+COPY local.php ./Nominatim/build/settings/local.php
 
 COPY nominatim.conf /etc/apache2/sites-enabled/000-default.conf
 
 RUN sudo easy_install pip && pip install osmium
 
 ENV PBF_DATA https://s3.amazonaws.com/mapzen.odes/ex_VjaZecMhNGAe7VCssBU6nFHY95zEw.osm.pbf
-RUN curl -L $PBF_DATA --create-dirs -o /app/Nominatim-3.0.0/data.osm.pbf
+RUN curl -L $PBF_DATA --create-dirs -o /app/Nominatim/data.osm.pbf
 RUN service postgresql start && \
     sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='nominatim'" | grep -q 1 || sudo -u postgres createuser -s nominatim && \
     sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='www-data'" | grep -q 1 || sudo -u postgres createuser -SDR www-data && \
     useradd -m -p password1234 nominatim && \
-    chown -R nominatim:nominatim ./Nominatim-3.0.0 && \
-    sudo -u nominatim ./Nominatim-3.0.1/build/utils/setup.php --osm-file /app/Nominatim-3.0.1/data.osm.pbf --all --threads 2 && \
-    sudo -u nominatim ./Nominatim-3.0.1/build/utils/update.php --init-updates && \
+    chown -R nominatim:nominatim ./Nominatim && \
+    sudo -u nominatim ./Nominatim/build/utils/setup.php --osm-file /app/Nominatim/data.osm.pbf --all --threads 2 && \
+    sudo -u nominatim ./Nominatim/build/utils/update.php --init-updates && \
     service postgresql stop
 
 EXPOSE 5432
