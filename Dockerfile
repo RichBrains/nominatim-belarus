@@ -26,11 +26,10 @@ WORKDIR /app
 RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.6/main/pg_hba.conf && \
     echo "listen_addresses='*'" >> /etc/postgresql/9.6/main/postgresql.conf
 
-ENV NOMINATIM_VERSION v3.0.1
-RUN wget http://www.nominatim.org/release/Nominatim-3.0.0.tar.bz2 && tar xf Nominatim-3.0.0.tar.bz2
-RUN cd Nominatim-3.0.0 && mkdir build && cd build && cmake .. && make
+RUN wget http://www.nominatim.org/release/Nominatim-3.0.1.tar.bz2 && tar xf Nominatim-3.0.1.tar.bz2
+RUN cd Nominatim-3.0.1 && mkdir build && cd build && cmake .. && make
 
-COPY local.php ./Nominatim-3.0.0/build/settings/local.php
+COPY local.php ./Nominatim-3.0.1/build/settings/local.php
 
 COPY nominatim.conf /etc/apache2/sites-enabled/000-default.conf
 
