@@ -42,8 +42,8 @@ RUN service postgresql start && \
     sudo -u postgres psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='www-data'" | grep -q 1 || sudo -u postgres createuser -SDR www-data && \
     useradd -m -p password1234 nominatim && \
     chown -R nominatim:nominatim ./Nominatim-3.0.0 && \
-    sudo -u nominatim ./Nominatim-3.0.0/build/utils/setup.php --osm-file /app/Nominatim-3.0.0/data.osm.pbf --all --threads 2 && \
-    sudo -u nominatim ./Nominatim-3.0.0/build/utils/update.php --init-updates && \
+    sudo -u nominatim ./Nominatim-3.0.1/build/utils/setup.php --osm-file /app/Nominatim-3.0.1/data.osm.pbf --all --threads 2 && \
+    sudo -u nominatim ./Nominatim-3.0.1/build/utils/update.php --init-updates && \
     service postgresql stop
 
 EXPOSE 5432
